@@ -2,27 +2,47 @@ def get_users():
     return [
         {
             "id": 1,
-            "name": "John Doe",
-            "email": "john@doe.com"
+            "firstName": "John Doe",
+            "lastName": "Doe",
+            "age": 30,
+            "gender": "male",
+            "email": "john@doe.com",
+            "phone": "123-456-7890",
         },
         {
             "id": 2,
-            "name": "Jane Doe",
-            "email": "jan@doe.com"
+            "firstName": "Jane Doe",
+            "lastName": "Doe",
+            "age": 30,
+            "gender": "female",
+            "email": "jan@doe.com",
+            "phone": "123-456-7890",
         },
         {
             "id": 3,
-            "name": "Alice",
-            "email": "alice@doe.com"
+            "firstName": "Alice",
+            "lastName": "Doe",
+            "age": 30,
+            "gender": "female",
+            "email": "alice@doe.com",
+            "phone": "123-456-7890",
         },
         {
             "id": 4,
-            "name": "Bob",
-            "email": "bob@doe.com"
+            "firstName": "Bob",
+            "lastName": "Doe",
+            "age": 30,
+            "gender": "male",
+            "email": "bob@doe.com",
+            "phone": "123-456-7890",
         },
         {
             "id": 5,
-            "name": "Charlie",
-            "email": "charlie@doe.com"
+            "firstName": "Charlie",
+            "lastName": "Doe",
+            "age": 30,
+            "gender": "male",
+            "email": "charlie@doe.com",
+            "phone": "123-456-7890",
         }
     ]
