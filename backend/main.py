@@ -35,6 +35,6 @@ def get_users_list():
 def update_user(user_id: int, user: User):
     for the_user in users:
         if the_user["id"] == user_id:
-            the_user.update(user.dict())
+            the_user.update(user.model_dump())
             return the_user
     raise HTTPException(status_code=404, detail="User not found")
