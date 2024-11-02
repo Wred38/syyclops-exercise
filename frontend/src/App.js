@@ -3,7 +3,13 @@ import axios from "axios";
 
 
 // App may look a bit plain since there there was no instructions to include header.
+// I left out loading and error page for simplicitys sake
 
+
+// CHOOSE where to get the user data from:
+
+// const url = "https://dummyjson.com/users"
+const url = "http://127.0.0.1:8000/users"
 
 export default function App() {
   const [data, setData] = useState(null);
@@ -11,21 +17,60 @@ export default function App() {
   const [error, setError] = useState(null);
   const [person, setPerson] = useState(null);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [isEditable, setIsEditable] = useState(false);
 
   useEffect(() => {
-    axios("https://dummyjson.com/users?limit=20")
+    // axios("https://dummyjson.com/users?limit=20")
+    axios(`${url}?limit=20`)
       .then((response) => {
-        setData(response.data);
-        // setPerson(response.data.users[0]);
+        setData(response.data)
       })
       .catch((error) => {
-        console.error("Error is", error);
-        setError(error);
+        console.error("Error is", error)
+        setError(error)
       })
       .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+        setLoading(false)
+      })
+  }, [])
+
+  const handleSave = () => {
+    if (person) {
+      const updatedData = {
+        id: person.id,
+        firstName: document.getElementsByName("firstName")[0].value,
+        lastName: document.getElementsByName("lastName")[0].value,
+        age: document.getElementsByName("age")[0].value,
+        gender: document.getElementsByName("gender")[0].value,
+        email: document.getElementsByName("email")[0].value,
+        phone: document.getElementsByName("phone")[0].value,
+      };
+
+      updateUser(person.id, updatedData)
+      setIsEditable(false)
+    }
+  }
+
+  const updateUser = (userId, updatedUserData) => {
+    axios
+      // .put(`https://dummyjson.com/users/${userId}`, updatedUserData)
+      .put(`${url}/${userId}`, updatedUserData)
+      .then((response) => {
+        const updatedUser = response.data
+        setData((prevData) => ({
+          ...prevData,
+          users: prevData.users.map((user) =>
+            user.id === userId ? updatedUser : user
+          ),
+        }))
+        setPerson(updatedUser)
+        console.log("User updated successfully:", updatedUser)
+      })
+      .catch((error) => {
+        console.error("Error updating user:", error)
+        setError(error)
+      })
+  }
 
   if (loading) return "Loading...";
   if (error) return "Error while loading data.";
@@ -38,13 +83,15 @@ export default function App() {
       />
       {showSidebar && <Backdrop setShowSidebar={() => setShowSidebar(false) }/>}
 
-      <Sidebar data={data} setPerson={setPerson} showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
-      <Main person={person} />
+      <Sidebar data={data} setPerson={setPerson} showSidebar={showSidebar} setShowSidebar={setShowSidebar} setIsEditable={setIsEditable} />
+      <Main person={person} isEditable={isEditable} setIsEditable={setIsEditable} handleSave={handleSave} />
     </>
   );
 }
 
-function Sidebar({ data, setPerson, showSidebar, setShowSidebar }) {
+
+
+function Sidebar({ data, setPerson, showSidebar, setShowSidebar, setIsEditable }) {
   return (
     <aside
       id="default-sidebar"
@@ -62,6 +109,7 @@ function Sidebar({ data, setPerson, showSidebar, setShowSidebar }) {
                 onClick={() => {
                   setPerson(user)
                   setShowSidebar(false)
+                  setIsEditable(false)
                 }}
                 className="flex items-center p-2 text-syyclops-primary rounded-lg hover:bg-gray-700 group"
               >
@@ -80,33 +128,59 @@ function Sidebar({ data, setPerson, showSidebar, setShowSidebar }) {
   );
 }
 
-function Main({ person }) {
+
+
+function Main({ person, isEditable, setIsEditable, handleSave }) {
   return (
     <div className="p-6 sm:ml-64">
       <div className="p-6 bg-syyclops-secondary border border-gray-200 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-syyclops-primary mb-4 border-b-2 border-syyclops-accent pb-2">
-          User Data
-        </h1>
+        <div className="flex justify-between mb-4 border-b-2 border-syyclops-accent pb-2 pr-4">
+          <h1 className="text-2xl font-bold text-syyclops-primary ">
+            User Data
+          </h1>
+          {person && <button onClick={() => setIsEditable(!isEditable)} className="border border-syyclops-accent rounded-md p-1 pl-2 pr-2 text-syyclops-primary">edit</button>}
+        </div>
         {person ? (
           <ul className="space-y-2">
-            <li className="text-syyclops-primary"><strong>ID:</strong> {person.id}</li>
-            <li className="text-syyclops-primary"><strong>First Name:</strong> {person.firstName}</li>
-            <li className="text-syyclops-primary"><strong>Last Name:</strong> {person.lastName}</li>
-            <li className="text-syyclops-primary"><strong>Age:</strong> {person.age}</li>
-            <li className="text-syyclops-primary"><strong>Gender:</strong> {person.gender}</li>
-            <li className="text-syyclops-primary"><strong>Email:</strong> {person.email}</li>
-            <li className="text-syyclops-primary"><strong>Phone:</strong> {person.phone}</li>
+            <UserData label="ID" data={person.id} isEditable={false} />
+            <UserData label="First Name" data={person.firstName} isEditable={isEditable} name="firstName" />
+            <UserData label="Last Name" data={person.lastName} isEditable={isEditable} name="lastName" />
+            <UserData label="Age" data={person.age} isEditable={isEditable} name="age" type="number" />
+            <UserData label="Gender" data={person.gender} isEditable={isEditable} name="gender" />
+            <UserData label="Email" data={person.email} isEditable={isEditable} name="email" />
+            <UserData label="Phone" data={person.phone} isEditable={isEditable} name="phone" />
           </ul>
         ) : (
           <p className="text-gray-400">No user selected</p>
+        )}
+        {isEditable && (
+          <button onClick={handleSave} className="mt-4 p-1 pl-2 pr-2 border rounded-md border-syyclops-accent text-syyclops-primary">
+            save
+          </button>
         )}
       </div>
     </div>
   );
 }
 
+
+
+function UserData({ label, data, isEditable, name, type="text" }) {
+  if (isEditable) {
+    return (
+      <>
+        <label className="text-syyclops-primary"><strong>{label}: </strong></label>
+        <input type={type} name={name} defaultValue={data || ''} className="pl-1 border rounded-md border-syyclops-accent bg-transparent text-syyclops-primary"/><br />
+      </>
+    )
+  }
+  return <li className="text-syyclops-primary"><strong>{label}:</strong> {data}</li>
+}
+
+
+
 function SidebarToggleButton({ showSidebar, setShowSidebar }) {
-  return(
+  return (
     <button
       onClick={() => setShowSidebar(!showSidebar)}
       aria-controls="default-sidebar"
@@ -125,6 +199,8 @@ function SidebarToggleButton({ showSidebar, setShowSidebar }) {
   )
   
 }
+
+
 
 function Backdrop({ setShowSidebar }) {
   return (
