@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Union
-from users import get_users
+from .users import get_users
 from fastapi.middleware.cors import CORSMiddleware
 
 
