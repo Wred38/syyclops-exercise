@@ -53,7 +53,7 @@ export default function App() {
     const ageInput = document.getElementsByName("age")[0].value;
     const phoneInput = document.getElementsByName("phone")[0];
     const emailInput = document.getElementsByName("email")[0];
-    console.log(ageInput)
+    
     if (isNaN(ageInput) || ageInput <= 0) {
       alert("Please enter a valid age.")
       return false
