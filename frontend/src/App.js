@@ -3,13 +3,13 @@ import axios from "axios";
 
 
 // App may look a bit plain since there there was no instructions to include header.
-// I left out loading and error page for simplicitys sake
+// I left out loading and error page for simplicitys sake.
 
 
 // CHOOSE where to get the user data from:
 
-// const url = "https://dummyjson.com/users"
-const url = "http://127.0.0.1:8000/users"
+// const url = "https://dummyjson.com/users";
+const url = "http://127.0.0.1:8000/users";
 
 export default function App() {
   const [data, setData] = useState(null);
@@ -20,7 +20,6 @@ export default function App() {
   const [isEditable, setIsEditable] = useState(false);
 
   useEffect(() => {
-    // axios("https://dummyjson.com/users?limit=20")
     axios(`${url}?limit=20`)
       .then((response) => {
         setData(response.data)
@@ -35,7 +34,7 @@ export default function App() {
   }, [])
 
   const handleSave = () => {
-    if (person) {
+    if (person && validateInputs) {
       const updatedData = {
         id: person.id,
         firstName: document.getElementsByName("firstName")[0].value,
@@ -44,16 +43,37 @@ export default function App() {
         gender: document.getElementsByName("gender")[0].value,
         email: document.getElementsByName("email")[0].value,
         phone: document.getElementsByName("phone")[0].value,
-      };
-
+      }
       updateUser(person.id, updatedData)
       setIsEditable(false)
     }
   }
 
+  const validateInputs = () => {
+    const ageInput = document.getElementsByName("age")[0].value;
+    const phoneInput = document.getElementsByName("phone")[0];
+    const emailInput = document.getElementsByName("email")[0];
+  
+    if (isNaN(ageInput) || ageInput <= 0) {
+      alert("Please enter a valid age.")
+      return false
+    }
+  
+    if (!phoneInput.checkValidity()) {
+      alert("Please enter a valid phone number format: 123-456-7890.")
+      return false
+    }
+  
+    if (!emailInput.checkValidity()) {
+      alert("Please enter a valid email address.")
+      return false
+    }
+  
+    return true
+  }
+
   const updateUser = (userId, updatedUserData) => {
     axios
-      // .put(`https://dummyjson.com/users/${userId}`, updatedUserData)
       .put(`${url}/${userId}`, updatedUserData)
       .then((response) => {
         const updatedUser = response.data
@@ -86,7 +106,7 @@ export default function App() {
       <Sidebar data={data} setPerson={setPerson} showSidebar={showSidebar} setShowSidebar={setShowSidebar} setIsEditable={setIsEditable} />
       <Main person={person} isEditable={isEditable} setIsEditable={setIsEditable} handleSave={handleSave} />
     </>
-  );
+  )
 }
 
 
@@ -125,7 +145,7 @@ function Sidebar({ data, setPerson, showSidebar, setShowSidebar, setIsEditable }
         </ul>
       </div>
     </aside>
-  );
+  )
 }
 
 
@@ -147,8 +167,8 @@ function Main({ person, isEditable, setIsEditable, handleSave }) {
             <UserData label="Last Name" data={person.lastName} isEditable={isEditable} name="lastName" />
             <UserData label="Age" data={person.age} isEditable={isEditable} name="age" type="number" />
             <UserData label="Gender" data={person.gender} isEditable={isEditable} name="gender" />
-            <UserData label="Email" data={person.email} isEditable={isEditable} name="email" />
-            <UserData label="Phone" data={person.phone} isEditable={isEditable} name="phone" />
+            <UserData label="Email" data={person.email} isEditable={isEditable} name="email" type="email" />
+            <UserData label="Phone" data={person.phone} isEditable={isEditable} name="phone" type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" />
           </ul>
         ) : (
           <p className="text-gray-400">No user selected</p>
@@ -160,17 +180,18 @@ function Main({ person, isEditable, setIsEditable, handleSave }) {
         )}
       </div>
     </div>
-  );
+  )
 }
 
 
 
-function UserData({ label, data, isEditable, name, type="text" }) {
+function UserData({ label, data, isEditable, name, type="text", pattern }) {
   if (isEditable) {
     return (
       <>
         <label className="text-syyclops-primary"><strong>{label}: </strong></label>
-        <input type={type} name={name} defaultValue={data || ''} className="pl-1 border rounded-md border-syyclops-accent bg-transparent text-syyclops-primary"/><br />
+        <input type={type} name={name} defaultValue={data || ''} pattern={pattern} className="pl-1 border rounded-md border-syyclops-accent bg-transparent text-syyclops-primary"/>
+        <br />
       </>
     )
   }
@@ -197,7 +218,6 @@ function SidebarToggleButton({ showSidebar, setShowSidebar }) {
       </svg>
     </button>
   )
-  
 }
 
 
