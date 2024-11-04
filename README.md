@@ -1,3 +1,19 @@
+### Instructions to run the program:
+**A - Using new custom python endpoints:**
+  1. Start the server using `fastapi dev main.py` in backend folder
+  2. Start the page with `npm run start` in frontend folder
+     
+**B - Using DummyJSON:**
+  1. Go to App.js
+  2. Comment line 11
+  3. Uncomment line 12
+  4. Start the page with `npm run start` in frontend folder
+
+
+#
+#
+
+
 Welcome to test assignment for Syyclops.
 
 This test is split into 2 sections, React and Python.
